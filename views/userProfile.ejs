@@ -1,0 +1,59 @@
+<!DOCUMENT html>
+<html>
+<head>
+    <title><%= titleApp %></title>
+    <meta charset="utd-8">
+    <link rel="stylesheet" href="https://stackpatd.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<%- include("partials/head.ejs") %>
+<a href="/">Add User</a>
+<table>
+    <th>Id</th>
+    <th>Name</th>
+    <th>UserName</th>
+    <th>Age</th>
+    <th>Phone</th>
+    <th>Email</th>
+    <% allDataUser.forEach(item => { %>
+        <tr class="border border-dark">
+            <td><%= item.id %></td>
+            <td><%= item.name %></td>
+            <td><%= item.userName %></td>
+            <td><%= item.age %></td>
+            <td><%= item.phone %></td>
+            <td><%= item.email %></td>
+            <td>
+                <button class="delete">Delete</button>
+            </td>
+            <td>
+                <form method="get" action="/users/edit/<%= item.id %>">
+                    <input type="submit" name="edit" value="Edit">
+                </form>
+            </td>
+            <td> <p id="userDelete"></p></td>
+        </tr>
+    <% }) %>
+</table>
+
+<script>
+    const deleteButton = document.querySelectorAll(".delete");
+    Array.from(deleteButton).forEach(function (e) {
+        e.addEventListener("click", function () {
+            const id = this.parentNode.parentNode.firstElementChild.innerText;
+            const request = new XMLHttpRequest();
+            const userId = JSON.stringify({id: id});
+            request.open("post", "/delete", true);
+            request.setRequestHeader("Content-Type", "application/json");
+            request.addEventListener("load",  () => {
+                this.parentNode.parentNode.lastElementChild.innerText = JSON.parse(request.response);
+            })
+            request.send(userId);
+        })
+    })
+
+</script>
+</body>
+</html>

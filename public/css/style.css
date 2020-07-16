@@ -1,0 +1,36 @@
+td, th {
+    padding: 10px;
+}
+
+header {
+    background-color: aqua;
+    height: 50px;
+}
+
+#loginSubmit{
+    margin-top: 20px;
+    margin-left: 7.5%;
+}
+
+form > div {
+    display: flex;
+    align-items: center;
+}
+
+form > div > input {
+    height: 40px;
+}
+
+form > div > p {
+    height: 24px;
+    margin-left: 1%;
+    margin-top: 10px;
+}
+
+#photo{
+    margin-left: 64px;
+}
+
+#photoProfile{
+  border-radius: 50%;
+}

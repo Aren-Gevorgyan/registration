@@ -1,0 +1,51 @@
+<!DOCUMENT html>
+<html>
+<head>
+    <title><%= titleApp %></title>
+    <meta charset="utd-8">
+    <link rel="stylesheet" href="https://stackpatd.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<%- include("partials/head.ejs") %>
+<a href="/registration">Add User</a>
+<a href="/">Login</a>
+<p><%= user.name %></p>
+<form name="edit">
+
+    <% user.forEach(item => { %>
+        <input type="hidden" name="id" value="<%= item.id %>">
+        <input type="text" name="name" value="<%= item.name %>">
+        <input type="text" name="surName" value="<%= item.userName %>">
+        <input type="number" name="age" value="<%= item.age %>">
+        <input type="number" name="phone" value="<%= item.phone %>">
+        <input type="email" name="email" value="<%= item.email %>">
+    <% }) %>
+
+    <input type="submit" name="update" value="Update" id="update">
+</form>
+<script>
+    const update = document.querySelector("#update");
+    update.addEventListener("click", function () {
+        const editForm = document.forms["edit"];
+        const idUser = editForm.elements["id"].value;
+        const nameUser = editForm.elements["name"].value;
+        const userName = editForm.elements["surName"].value;
+        const ageUser = editForm.elements["age"].value;
+        const phoneUser = editForm.elements["phone"].value;
+        const emailUser = editForm.elements["email"].value;
+        const user = JSON.stringify({id: idUser, name: nameUser, userName: userName,
+            age: ageUser, phone: phoneUser, email: emailUser});
+        const request = new XMLHttpRequest();
+        request.open("post", "/update", true);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.addEventListener("load", function () {
+                const getData = JSON.parse(request.response);
+                console.log(getData);
+        })
+        request.send(user);
+    })
+</script>
+</body>
+</html>

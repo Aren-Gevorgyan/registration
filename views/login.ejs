@@ -1,0 +1,139 @@
+<!DOCUMENT html>
+<html>
+<head>
+    <title><%= titleApp %></title>
+    <meta charset="uth-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<%- include("partials/head.ejs") %>
+
+<form name="loginForm" id="login"  method="post" action="/profile">
+    <div class="col-5">
+        <label class="col-2">Login</label>
+        <input type="text" name="login" id="login" required>
+        <p id='errorLogin'></p>
+    </div>
+
+    <div class="col-5">
+        <label class="col-2">Password</label>
+        <input type="password" name="password" id="password" required>
+        <p id='errorPassword'></p>
+    </div>
+
+    <input type="submit" name="submit" id="loginSubmit">
+</form>
+
+<a href="/registration" class="ml-4">Registration</a>
+
+<script>
+    const emailLogin = document.getElementById('login');
+    emailLogin.addEventListener('mouseout', function (e) {
+        e.preventDefault();
+        const userData = getValueLogin();
+        sendRequestLogin('post', '/existLogin', userData)
+            .then(data => {
+                existsOrNot(data);
+            })
+            .catch(err => {
+                console.log(err.message);
+            })
+    })
+
+    function getValueLogin() {
+        const getForm = document.forms['loginForm'];
+        const login = getForm.elements['login'].value;
+        return JSON.stringify({
+            login: login,
+        });
+    }
+
+    function existsOrNot(data) {
+        let ifLoginExist = typeof data === 'string';
+        if (ifLoginExist) {
+            setNotes(true, data, "errorLogin");
+        } else {
+            setNotes(false, data, "errorLogin");
+        }
+    }
+
+    const passwordLogin = document.getElementById('password');
+    passwordLogin.addEventListener('mouseout', function (e) {
+        e.preventDefault();
+        const userData = getValuePasswordLogin();
+        sendRequestLogin('post', '/password/login', userData)
+            .then(data => {
+                passwordExistsOrNot(data);
+            })
+            .catch(err => {
+                console.log(err.message);
+            })
+    })
+
+    function passwordExistsOrNot(data) {
+        let ifPasswordExist = typeof data === 'string';
+        if (ifPasswordExist) {
+            setNotes(true, data, "errorPassword");
+            disabledButtonLogin(false);
+        } else {
+            setNotes(false, data, "errorPassword");
+            disabledButtonLogin(true);
+        }
+    }
+
+    function setNotes(ifExist, data, idNotes) {
+        const notes = document.getElementById(idNotes);
+        if (ifExist) {
+            notes.innerText = data.toString();
+            notes.style.color = 'red';
+        } else {
+            notes.innerText = "Good";
+            notes.style.color = 'green';
+        }
+    }
+
+    function getValuePasswordLogin() {
+        const getForm = document.forms['loginForm'];
+        const password = getForm.elements['password'].value;
+        const login = getForm.elements['login'].value;
+        console.log(password);
+        console.log(login);
+        return JSON.stringify({
+            password: password,
+            login: login
+        });
+    }
+
+    function sendRequestLogin(method, url, userData) {
+        return new Promise(function (resolve, reject) {
+            let request = new XMLHttpRequest();
+            request.open(method, url, true);
+            request.setRequestHeader("Content-Type", "application/json");
+            getResponseFromServerLogin(request, reject, resolve);
+            request.send(userData);
+        })
+    }
+
+    function getResponseFromServerLogin(request, reject, resolve) {
+        request.onload = () => {
+            if (request.status < 400 && request.readyState === 4) {
+                resolve(JSON.parse(request.response));
+            } else {
+                reject(request.response);
+            }
+        }
+    }
+
+    function disabledButtonLogin(ifExist) {
+        if (ifExist) {
+            document.getElementById('loginSubmit').removeAttribute('disabled');
+        } else {
+            document.getElementById('loginSubmit').setAttribute('disabled', "disabled");
+        }
+    }
+    
+</script>
+</body>
+</html>

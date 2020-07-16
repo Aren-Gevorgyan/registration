@@ -1,0 +1,173 @@
+<!DOCUMENT html>
+<html>
+<head>
+    <title><%= titleApp %></title>
+    <meta charset="uth-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<%- include("partials/head.ejs") %>
+<h1 class="ml-4 mt-5"><%= title %></h1>
+<form name="registrationForm" action="/users" method="post" enctype="multipart/form-data">
+    <div class="col-5">
+        <label class="col-2">Name</label>
+        <input type="text" name="name" required>
+        <p id='#name'></p>
+    </div>
+
+    <div class="col-5">
+        <label class="col-2">SurName</label>
+        <input type="text" name="surName" required>
+        <p id='#surName'></p>
+    </div>
+
+
+    <div class="col-5">
+        <label class="col-2">Age</label>
+        <input type="number" name="age" required>
+        <p id='#age'></p>
+    </div>
+
+    <div class="col-5">
+        <label class="col-2">Phone</label>
+        <input type="number" name="phone" required>
+        <p id='#phone'></p>
+    </div>
+
+    <div class="col-5">
+        <label class="col-2">Email</label>
+        <input type="email" name="email" id="email" required>
+        <p id='errorEmail'></p>
+    </div>
+
+    <div class="col-5">
+        <label class="col-2">Login</label>
+        <input type="text" name="login" id="login" required>
+        <p id='errorLogin'></p>
+    </div>
+
+    <div class="col-5">
+        <label class="col-2">Password</label>
+        <input type="password" name="password" id="password" required>
+        <p id='errorPassword'></p>
+    </div>
+
+    <div class="col-5 mt-3" id="photo">
+        <input type="file" name="photo" id="photo" required>
+        <p id='errorPhoto'></p>
+    </div>
+
+    <input type="submit" id="submit" name="registrButton" value="Registr" class="col-1 ml-4 mt-4">
+</form>
+<script>
+
+    const emailInputReg = document.getElementById('email');
+    emailInputReg.addEventListener('mouseout', function (e) {
+        e.preventDefault();
+        const userData = getValueEmailRegistration();
+        sendRequest('post', '/email', userData)
+            .then(data => {
+                emailExistsOrNot(data);
+            })
+            .catch(err => {
+                console.log(err.message);
+            })
+    })
+
+    function emailExistsOrNot(data) {
+        let ifEmailExist = typeof data === 'string';
+        if (ifEmailExist) {
+            setNotes(true, data, 'errorEmail');
+            disabledButtonReg(false);
+        } else {
+            setNotes(false, data, 'errorEmail');
+            disabledButtonReg(true);
+        }
+    }
+
+    function getValueEmailRegistration() {
+        const getForm = document.forms['registrationForm'];
+        const email = getForm.elements['email'].value;
+
+        return JSON.stringify({
+            email: email,
+        });
+    }
+
+    const passwordInputReg = document.getElementById('password');
+    passwordInputReg.addEventListener('mouseout', function (e) {
+        e.preventDefault();
+        const userData = getValueRegistration();
+        sendRequest('post', '/password', userData)
+            .then(data => {
+                passwordExistsOrNot(data);
+            })
+            .catch(err => {
+                console.log(err.message);
+            })
+    })
+
+    function passwordExistsOrNot(data) {
+        let ifPasswordExist = typeof data === 'string';
+        if (ifPasswordExist) {
+            setNotes(true, data, 'errorPassword');
+            disabledButtonReg(false);
+        } else {
+            setNotes(false, data, 'errorPassword');
+            disabledButtonReg(true);
+        }
+    }
+
+    function setNotes(ifExist, data, setId) {
+        const notes = document.getElementById(setId);
+        if (ifExist) {
+            notes.innerText = data.toString();
+            notes.style.color = 'red';
+        } else {
+            notes.innerText = "Good";
+            notes.style.color = 'green';
+        }
+    }
+
+    function getValueRegistration() {
+        const getForm = document.forms['registrationForm'];
+        const password = getForm.elements['password'].value;
+
+        return JSON.stringify({
+            password: password,
+        });
+    }
+
+    function sendRequest(method, url, userData) {
+        return new Promise(function (resolve, reject) {
+            let request = new XMLHttpRequest();
+            request.open(method, url, true);
+            request.setRequestHeader("Content-Type", "application/json");
+            getResponseFromServer(request, reject, resolve);
+            request.send(userData);
+        })
+    }
+
+    function getResponseFromServer(request, reject, resolve) {
+        request.onload = () => {
+            if (request.status < 400 && request.readyState === 4) {
+                resolve(JSON.parse(request.response));
+            } else {
+                reject(request.response);
+            }
+        }
+    }
+
+    function disabledButtonReg(ifExist) {
+        if (ifExist) {
+            document.getElementById('submit').removeAttribute('disabled');
+        } else {
+            document.getElementById('submit').setAttribute('disabled', "disabled");
+        }
+    }
+
+</script>
+</body>
+</html>
