@@ -1,17 +1,7 @@
-const mysql = require('mysql2');
 const usersData = [];
 const passwordHash = require('password-hash');
-
-function connectMySql() {
-    return mysql.createConnection({
-        host: 'localHost',
-        user: 'root',
-        database: 'user',
-        password: '1996karich'
-    });
-}
-
-const connectionMySql = connectMySql();
+const keys = require('../config/keys');
+const connectionMySql = keys.mysql;
 
 connectionMySql.connect(function (err) {
     if (err) {

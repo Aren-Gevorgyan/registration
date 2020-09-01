@@ -1,5 +1,8 @@
 const Users = require('../modules/registrationModules');
 const passwordHash = require('password-hash');
+const random = require('../app')
+
+console.log(random.text);
 
 exports.login = function (request, response) {
     response.render("login", {
@@ -55,7 +58,7 @@ exports.users = function (request, response) {
     const userEmail = request.body.email;
     const userPassword = request.body.password;
     const userLogin = request.body.login;
-    const userPhoto = Date.now() + request.file.originalname;
+    const userPhoto = request.file.originalname;
     const usersData = new Users(userName, userSurName, userAge, userPhone, userEmail, userPassword, userLogin, userPhoto);
     usersData.saveUserData();
 
