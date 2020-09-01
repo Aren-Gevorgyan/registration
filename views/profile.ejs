@@ -1,4 +1,4 @@
-<!DOCUMENT html>
+<!DOCTYPE html>
 <html>
 <head>
     <title><%= titleApp %></title>
@@ -10,8 +10,8 @@
 <body>
 <%- include("partials/head.ejs") %>
 <div class="row">
-    <img src="images/<%= photo %>" id="photoProfile" class="col-2 mt-4 ml-3">
-    <h3 class="ml-4 mt-4"><%= name %> <%= surName %></h3>
+    <img src="/images/<%= user[0].photo %>" id="photoProfile" class=" mt-4 ml-3">
+    <h3 class="ml-4 mt-4"><%= user[0].name %> <%= user[0].userName %></h3>
 </div>
 </body>
 </html>

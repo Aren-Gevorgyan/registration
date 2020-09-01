@@ -28,7 +28,7 @@ module.exports = class User {
         this.email = email;
         this.password = passwordHash.generate(password);
         this.login = login;
-        this.photo = photo;//
+        this.photo = photo;
         usersData.push(this.name);
         usersData.push(this.surName);
         usersData.push(this.age);
@@ -36,7 +36,7 @@ module.exports = class User {
         usersData.push(this.email);
         usersData.push(this.password);
         usersData.push(this.login);
-        usersData.push(this.photo);//
+        usersData.push(this.photo);
     }
 
     saveUserData() {
@@ -51,75 +51,40 @@ module.exports = class User {
         usersData.length = 0;
     }
 
-    static getEmailDataFromUserData(request, response) {
-        connectionMySql.query("SELECT email FROM userData", function (err, result) {
-            if (err) {
-                console.error(err.message);
-            } else {
-                return User.emailExistsOrNot(request, response, result);
-            }
-        });
+    static getEmailDataFromUserData() {
+        return new Promise(function (resolve, reject) {
+            connectionMySql.query("SELECT email FROM userData", function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
     }
 
-    static emailExistsOrNot(request, response, result) {
-        let ifEmailNotExists;
-        let ifEmailIsNull;
-        for (let i = 0; i < result.length; i++) {
-            ifEmailNotExists = request.body.email === result[i].email;
-            ifEmailIsNull = request.body.email.length === 0;
-            if (ifEmailNotExists || ifEmailIsNull) {
-                return response.json("Is email already exists or null, write new email");
-            }
-        }
-        return response.json(request.body);
+    static getLoginDataFromUserData() {
+        return new Promise(function (resolve, reject) {
+            connectionMySql.query("SELECT login FROM userData", function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
     }
 
-    static getLoginDataFromUserData(request, response) {
-        connectionMySql.query("SELECT login FROM userData", function (err, result) {
-            if (err) {
-                console.error(err.message);
-            } else {
-                return User.loginExistsOrNot(request, response, result);
-            }
-        });
-    }
-
-    static loginExistsOrNot(request, response, result) {
-        let ifLoginNotExists;
-        let ifLoginIsNull;
-        for (let i = 0; i < result.length; i++) {
-            ifLoginNotExists = request.body.login !== result[i].login;
-            ifLoginIsNull = request.body.login.length === 0;
-            if (ifLoginNotExists || ifLoginIsNull) {
-                return response.json("Is false login or null, write new email");
-            }else{
-                return response.json(request.body);
-            }
-        }
-    }
-
-    static getPasswordDataFromUserData(request, response, password) {
-        connectionMySql.query("SELECT password FROM userData", function (err, result) {
-            if (err) {
-                console.error(err.message);
-            } else {
-                return User.passwordExistsOrNot(request, response, result, password);
-            }
-        });
-    }
-
-    static passwordExistsOrNot(request, response, result, password) {
-        let ifPasswordNotExists;
-        let ifPassWordIsNull;
-        for (let i = 0; i < result.length; i++) {
-            ifPasswordNotExists = passwordHash.verify(password, result[i].password);
-            ifPassWordIsNull = request.body.password.length === 0;
-            if (ifPasswordNotExists || ifPassWordIsNull) {
-                return response.json("Password exists, write new password");
-            }else {
-                return response.json(request.body);
-            }
-        }
+    static getPasswordDataFromUserData() {
+        return new Promise(function (resolve, reject) {
+            connectionMySql.query("SELECT password FROM userData", function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
     }
 
     static getUsersData(allData) {
@@ -147,7 +112,7 @@ module.exports = class User {
     }
 
     static updateUser(userData) {
-        const sql = "UPDATE userData SET name = ?, userName = ?, age = ?, phone = ?, email = ? WHERE id = ? ";
+        const sql = "UPDATE userData SET name = ?, userName = ?, age = ?, phone = ?, email = ?, photo = ? WHERE id = ? ";
         connectionMySql.query(sql, userData, function (err, result) {
             if (err) {
                 console.log("Error" + err.message);
@@ -173,7 +138,7 @@ module.exports = class User {
             const sql = "SELECT password FROM userdata WHERE login = ?";
             connectionMySql.query(sql, login, function (err, result) {
                 if (err) {
-                    reject(err.message);
+                    reject(err);
                 } else {
                     const hash_pass = result[0].password;
                     resolve(passwordHash.verify(password, hash_pass));
@@ -182,12 +147,24 @@ module.exports = class User {
         })
     }
 
-    static getUserData(login) {
+    static verifyData(login) {
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT name, userName, photo FROM userdata WHERE login = ?";
+            const sql = "SELECT id, name, userName, photo FROM userdata WHERE login = ?";
             connectionMySql.query(sql, login, function (err, result) {
                 if (err) {
-                    reject(err.message);
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+    static getUserData(id) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT name, userName, photo FROM userdata WHERE id = ?";
+            connectionMySql.query(sql, [id], function (err, result) {
+                if (err) {
+                    reject(err);
                 } else {
                     resolve(result);
                 }

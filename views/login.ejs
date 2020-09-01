@@ -1,4 +1,4 @@
-<!DOCUMENT html>
+<!DOCTYPE html>
 <html>
 <head>
     <title><%= titleApp %></title>
@@ -54,8 +54,10 @@
         let ifLoginExist = typeof data === 'string';
         if (ifLoginExist) {
             setNotes(true, data, "errorLogin");
+            // disabledButtonLogin(false);
         } else {
             setNotes(false, data, "errorLogin");
+            // disabledButtonLogin(true)
         }
     }
 
@@ -98,7 +100,6 @@
         const getForm = document.forms['loginForm'];
         const password = getForm.elements['password'].value;
         const login = getForm.elements['login'].value;
-        console.log(password);
         console.log(login);
         return JSON.stringify({
             password: password,

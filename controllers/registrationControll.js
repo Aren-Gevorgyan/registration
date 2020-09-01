@@ -1,4 +1,5 @@
 const Users = require('../modules/registrationModules');
+const passwordHash = require('password-hash');
 
 exports.login = function (request, response) {
     response.render("login", {
@@ -6,18 +7,35 @@ exports.login = function (request, response) {
     });
 }
 
+exports.account = function (request, response) {
+    const id = request.session.userId;
+    const getUrlId = request.params['id'];
+    const ifEqual = id === parseInt(getUrlId);
+    if (ifEqual) {
+        Users.getUserData(id)
+            .then(data => {
+                response.render("profile", {
+                    titleApp: "Account",
+                    user: data
+                });
+                response.redirect("/account");
+            }).catch(err => {
+            console.log(err.message);
+        });
+    } else {
+        response.redirect("/");
+    }
+}
+
 exports.profile = function (request, response) {
     if (!request.body) return response.sendStatus(404);
     const login = request.body.login;
-    Users.getUserData(login).then(data => {
-        console.log(data);
-        response.render("profile", {
-            titleApp: "Profile",
-            name: data[0].name,
-            surName: data[0].userName,
-            photo: data[0].photo,
-        });
-    })
+    Users.verifyData(login).then(data => {
+        request.session.userId = data[0].id;
+        response.redirect("/account/" + data[0].id);
+    }).catch(err => {
+        console.log(err.message);
+    });
 }
 
 exports.openRegistration = function (request, response) {
@@ -27,7 +45,7 @@ exports.openRegistration = function (request, response) {
     });
 }
 
-exports.users = function (request, response, next) {
+exports.users = function (request, response) {
     if (!request.body) return response.sendStatus(404);
 
     const userName = request.body.name;
@@ -37,7 +55,7 @@ exports.users = function (request, response, next) {
     const userEmail = request.body.email;
     const userPassword = request.body.password;
     const userLogin = request.body.login;
-    const userPhoto = request.file.originalname;
+    const userPhoto = Date.now() + request.file.originalname;
     const usersData = new Users(userName, userSurName, userAge, userPhone, userEmail, userPassword, userLogin, userPhoto);
     usersData.saveUserData();
 
@@ -61,12 +79,42 @@ exports.edit = function (request, response) {
 
 exports.email = function (request, response) {
     if (!request.body) return response.sendStatus(404);
-    Users.getEmailDataFromUserData(request, response);
+    Users.getEmailDataFromUserData().then(data => {
+        let ifEmailNotExists;
+        let ifEmailIsNull;
+        for (let i = 0; i < data.length; i++) {
+            ifEmailNotExists = request.body.email === data[i].email;
+            ifEmailIsNull = request.body.email.length === 0;
+            if (ifEmailNotExists || ifEmailIsNull) {
+                return response.json("Is email already exists or null, write new email");
+            }
+        }
+        return response.json(request.body);
+    });
 }
 
 exports.existLogin = function (request, response) {
     if (!request.body) return response.sendStatus(404);
-    Users.getLoginDataFromUserData(request, response);
+    Users.getLoginDataFromUserData().then(data => {
+        let ifLoginNotExists;
+        ifLoginIsNull(request, response);
+        for (let i = 0; i < data.length; i++) {
+            ifLoginNotExists = request.body.login === data[i].login;
+            if (ifLoginNotExists) {
+                return response.json(request.body);
+            }
+        }
+        return response.json("Is false login or null, write new email");
+    }).catch(err => {
+        console.log(err.message);
+    });
+}
+
+function ifLoginIsNull(request, response) {
+    let ifIsNull = request.body.login.length === 0;
+    if (ifIsNull) {
+        return response.json("Is false login or null, write new email");
+    }
 }
 
 exports.passwordLogin = function (request, response) {
@@ -79,13 +127,32 @@ exports.passwordLogin = function (request, response) {
         } else {
             response.json("Is password false  or null, write new password");
         }
+    }).catch(err => {
+        console.log(err.message);
     });
 }
 
 exports.password = function (request, response) {
     if (!request.body) return response.sendStatus(404);
-    const password = request.body.password;
-    Users.getPasswordDataFromUserData(request, response, password);
+    Users.getPasswordDataFromUserData().then(data => {
+        existsPassword(data, request, response);
+    }).catch(err => {
+        console.log(err.message);
+    });
+}
+
+function existsPassword(data, request, response) {
+    let ifPasswordNotExists;
+    let ifPasswordIsNull;
+    for (let i = 0; i < data.length; i++) {
+        ifPasswordNotExists = passwordHash.verify(password, data[i].password);
+        ifPasswordIsNull = request.body.password.length === 0;
+        if (ifPasswordNotExists || ifPasswordIsNull) {
+            return response.json("Password exists, write new password");
+        } else {
+            return response.json(request.body);
+        }
+    }
 }
 
 exports.delete = function (request, response) {

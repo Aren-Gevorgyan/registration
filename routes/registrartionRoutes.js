@@ -5,6 +5,7 @@ const registrationRoutes = express.Router();
 registrationRoutes.get('/users/edit/:id', registrationControllers.edit);
 registrationRoutes.get('/registration', registrationControllers.openRegistration);
 registrationRoutes.post('/profile', registrationControllers.profile);
+registrationRoutes.get('/account/:id', registrationControllers.account);
 registrationRoutes.post('/users', registrationControllers.users);
 registrationRoutes.get('/', registrationControllers.login);
 
