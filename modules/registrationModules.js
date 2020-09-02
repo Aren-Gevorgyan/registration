@@ -10,28 +10,25 @@ connectionMySql.connect(function (err) {
 });
 
 module.exports = class User {
-    constructor(name, surName, age, phone, email, password, login, photo) {
+    constructor(name, surName, age, phone, photo, email, login, password, token, refreshToken) {
         this.name = name;
         this.surName = surName;
         this.age = age;
         this.phone = phone;
-        this.email = email;
-        this.password = passwordHash.generate(password);
-        this.login = login;
         this.photo = photo;
-        usersData.push(this.name);
-        usersData.push(this.surName);
-        usersData.push(this.age);
-        usersData.push(this.phone);
-        usersData.push(this.email);
-        usersData.push(this.password);
-        usersData.push(this.login);
-        usersData.push(this.photo);
+        this.email = email;
+        this.login = login;
+        this.password = passwordHash.generate(password);
+        this.token = token;
+        this.refreshToken = refreshToken;
+        usersData.push(this.name, this.surName, this.age, this.phone, this.photo, this.email,
+            this.login, this.password, this.token, this.refreshToken);
     }
 
     saveUserData() {
-        const mySql = "INSERT INTO userdata(NAME, USERNAME, AGE, PHONE, EMAIL, PASSWORD, LOGIN, PHOTO) VALUES (?,?,?,?,?,?,?,?);";
-        connectionMySql.query(mySql, usersData, function (err, result) {
+        const mySql = "INSERT INTO userdata(name, userName, age, phone, photo, email, login, password," +
+            "token, refreshToken) VALUES (?,?,?,?,?,?,?,?,?,?);";
+        connectionMySql.query(mySql, usersData, (err) => {
             if (err) {
                 console.error(err.message);
             } else {
@@ -102,8 +99,8 @@ module.exports = class User {
     }
 
     static updateUser(userData) {
-        const sql = "UPDATE userData SET name = ?, userName = ?, age = ?, phone = ?, email = ?, photo = ? WHERE id = ? ";
-        connectionMySql.query(sql, userData, function (err, result) {
+        const sql = "UPDATE userData SET name = ?, userName = ?, age = ?, phone = ?, photo = ?, email = ?,  WHERE id = ? ";
+        connectionMySql.query(sql, userData, (err) => {
             if (err) {
                 console.log("Error" + err.message);
             } else {
@@ -114,7 +111,7 @@ module.exports = class User {
 
     static deleteUser(getUserId) {
         const sql = "DELETE FROM userData WHERE id = ?";
-        connectionMySql.query(sql, getUserId, function (err, result) {
+        connectionMySql.query(sql, getUserId, (err) => {
             if (err) {
                 console.log("Error" + err.message);
             } else {
@@ -126,7 +123,7 @@ module.exports = class User {
     static passwordLoginExistsOrNot(password, login) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT password FROM userdata WHERE login = ?";
-            connectionMySql.query(sql, login, function (err, result) {
+            connectionMySql.query(sql, [login], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
@@ -149,6 +146,7 @@ module.exports = class User {
             })
         })
     }
+
     static getUserData(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT name, userName, photo FROM userdata WHERE id = ?";
@@ -157,6 +155,19 @@ module.exports = class User {
                     reject(err);
                 } else {
                     resolve(result);
+                }
+            })
+        })
+    }
+
+    static getToken(login) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT token, refreshToken from userdata where login = ?";
+            connectionMySql.query(sql, [login], function (err, result){
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(result[0]);
                 }
             })
         })

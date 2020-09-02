@@ -22,5 +22,6 @@ module.exports = {
         database: 'user',
         password: '1996karich'
     }),
-    text: text
+    text: text,
+    jwt: "dev-jwt",
 }
