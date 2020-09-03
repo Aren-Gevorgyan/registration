@@ -50,12 +50,14 @@ module.exports = class User {
         })
     }
 
-    static getLoginDataFromUserData() {
+    static getLoginDataFromUserData(login) {
         return new Promise(function (resolve, reject) {
-            connectionMySql.query("SELECT login FROM userData", function (err, result) {
+            const sql = "SELECT login FROM userData where login = ?"
+            connectionMySql.query(sql, [login], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
+                    result = result[0] !== undefined;
                     resolve(result);
                 }
             });
@@ -163,10 +165,10 @@ module.exports = class User {
     static getToken(login) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT token, refreshToken from userdata where login = ?";
-            connectionMySql.query(sql, [login], function (err, result){
-                if(err){
+            connectionMySql.query(sql, [login], function (err, result) {
+                if (err) {
                     reject(err);
-                }else{
+                } else {
                     resolve(result[0]);
                 }
             })

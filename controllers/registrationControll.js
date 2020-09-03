@@ -112,28 +112,10 @@ exports.email = function (request, response) {
     });
 }
 
-// exports.existLogin = function (request, response) {
-//     if (!request.body) return response.sendStatus(404);
-//     Users.getLoginDataFromUserData().then(data => {
-//         let ifLoginNotExists;
-//         ifLoginIsNull(request, response);
-//         for (let i = 0; i < data.length; i++) {
-//             ifLoginNotExists = request.body.login === data[i].login;
-//             if (ifLoginNotExists) {
-//                 return response.json(request.body);
-//             }
-//         }
-//         return response.json("Is false login or null, write new email");
-//     }).catch(err => {
-//         console.log(err.message);
-//     });
-// }
-//
-
 function ifLoginIsNull(request, response) {
     let ifIsNull = request.body.login.length === 0;
     if (ifIsNull) {
-        return response.json("Is false login or null, write new login");
+        return response.sendStatus(401);
     }
 }
 
@@ -156,17 +138,14 @@ exports.passwordLogin = function (request, response) {
 }
 
 function existLogin(password, login, response, request) {
-    Users.getLoginDataFromUserData().then(data => {
-        let loginExists;
+    Users.getLoginDataFromUserData(login).then(data => {
         ifLoginIsNull(request, response);
-        for (let i = 0; i < data.length; i++) {
-            loginExists = request.body.login === data[i].login;
-            if (loginExists) {
-                existPassword(password, login, response);
-            } else if (i === data.length) {
-                response.json("login false");
-            }
+        if (data) {
+            existPassword(password, login, response);
+        } else {
+            response.sendStatus(401)
         }
+
     }).catch(err => {
         console.log(err.message);
     });
@@ -177,7 +156,7 @@ function existPassword(password, login, response) {
         if (passwordExistsOrNot) {
             responseToken(login, response)
         } else {
-            response.json("Is password false  or null, write new password");
+            response.sendStatus(401)
         }
     }).catch(err => {
         console.log(err.message);

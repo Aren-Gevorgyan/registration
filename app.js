@@ -16,9 +16,7 @@ app.use(session({
     secret: "root",
     resave: false,
     saveUninitialized: true,
-    cookie: {
-        maxAge: Date.now() + 60 * 60 * 1000  // 1 hour
-    }
+    cookie: {}
 }))
 
 const storageConfig = multer.diskStorage({
