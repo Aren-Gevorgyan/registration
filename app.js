@@ -39,6 +39,7 @@ const fileFilter = function (req, file, cb) {
     }
 }
 
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 app.use(multer({storage: storageConfig, fileFilter: fileFilter}).single("photo"));

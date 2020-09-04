@@ -1,32 +1,11 @@
 const Users = require('../modules/registrationModules');
 const passwordHash = require('password-hash');
 const keys = require('../config/keys')
-const jwt = require('jsonwebtoken');
 
 exports.login = function (request, response) {
     response.render("login", {
         titleApp: "Login"
     })
-}
-
-exports.account = function (request, response) {
-    const id = request.session.userId;
-    const getUrlId = request.params['id'];
-    const ifEqual = id === parseInt(getUrlId);
-    if (ifEqual) {
-        Users.getUserData(id)
-            .then(data => {
-                response.render("profile", {
-                    titleApp: "Account",
-                    user: data
-                });
-                response.redirect("/account");
-            }).catch(err => {
-            console.log(err.message);
-        });
-    } else {
-        response.redirect("/");
-    }
 }
 
 exports.openRegistration = function (request, response) {
@@ -47,10 +26,8 @@ exports.users = function (request, response) {
     const userEmail = request.body.email;
     const userLogin = request.body.login;
     const userPassword = request.body.password;
-    const token = createToken(userName, userEmail);
-    const refreshToken = createToken(userName, userEmail);
     const usersData = new Users(userName, userSurName, userAge, userPhone, userPhoto, userEmail,
-        userLogin, userPassword, token, refreshToken);
+        userLogin, userPassword);
     usersData.saveUserData();
 
     openProfile(response);
@@ -63,27 +40,6 @@ function openProfile(response) {
             allDataUser: allData,
         })
     });
-}
-
-function createToken(name, email) {
-    return 'Bearer ' + jwt.sign({
-        name: name,
-        email: email,
-        text: randomText(),
-    }, keys.jwt, {expiresIn: 60 * 60});
-}
-
-function randomText() {
-    const array = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k',
-        'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-    let randomIndex;
-    let randomText = "";
-    for (let i = 0; i < 5; i++) {
-        randomIndex = Math.floor(Math.random() * array.length);
-        randomText += array[randomIndex];
-    }
-    return randomText;
 }
 
 exports.edit = function (request, response) {
@@ -119,6 +75,25 @@ function ifLoginIsNull(request, response) {
     }
 }
 
+exports.account = function (request, response) {
+    const id = request.session.userId;
+    const getUrlId = request.params['id'];
+    const ifEqual = id === parseInt(getUrlId);
+    if (ifEqual) {
+        Users.getUserData(id)
+            .then(data => {
+                response.render("profile", {
+                    titleApp: 'Account',
+                    user: data
+                });
+            }).catch(err => {
+            console.log(err.message);
+        });
+    } else {
+        response.redirect("/");
+    }
+}
+
 exports.profile = function (request, response) {
     if (!request.body) return response.sendStatus(404);
     const login = request.body.login;
@@ -145,7 +120,6 @@ function existLogin(password, login, response, request) {
         } else {
             response.sendStatus(401)
         }
-
     }).catch(err => {
         console.log(err.message);
     });
@@ -154,24 +128,13 @@ function existLogin(password, login, response, request) {
 function existPassword(password, login, response) {
     Users.passwordLoginExistsOrNot(password, login).then(passwordExistsOrNot => {
         if (passwordExistsOrNot) {
-            responseToken(login, response)
+            response.sendStatus(200);
         } else {
-            response.sendStatus(401)
+            response.sendStatus(401);
         }
     }).catch(err => {
         console.log(err.message);
     });
-}
-
-function responseToken(login, response) {
-    Users.getToken(login).then(res => {
-        response.json({
-            token: res.token,
-            refreshToken: res.refreshToken
-        });
-    }).catch(() => {
-        response.sendStatus(401);
-    })
 }
 
 exports.password = function (request, response) {

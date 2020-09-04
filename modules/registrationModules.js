@@ -10,7 +10,7 @@ connectionMySql.connect(function (err) {
 });
 
 module.exports = class User {
-    constructor(name, surName, age, phone, photo, email, login, password, token, refreshToken) {
+    constructor(name, surName, age, phone, photo, email, login, password) {
         this.name = name;
         this.surName = surName;
         this.age = age;
@@ -19,15 +19,13 @@ module.exports = class User {
         this.email = email;
         this.login = login;
         this.password = passwordHash.generate(password);
-        this.token = token;
-        this.refreshToken = refreshToken;
         usersData.push(this.name, this.surName, this.age, this.phone, this.photo, this.email,
-            this.login, this.password, this.token, this.refreshToken);
+            this.login, this.password);
     }
 
     saveUserData() {
-        const mySql = "INSERT INTO userdata(name, userName, age, phone, photo, email, login, password," +
-            "token, refreshToken) VALUES (?,?,?,?,?,?,?,?,?,?);";
+        const mySql = "INSERT INTO userdata(name, userName, age, phone, photo, email, login, password)" +
+            " VALUES (?,?,?,?,?,?,?,?)";
         connectionMySql.query(mySql, usersData, (err) => {
             if (err) {
                 console.error(err.message);
@@ -139,7 +137,7 @@ module.exports = class User {
     static verifyData(login) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT id, name, userName, photo FROM userdata WHERE login = ?";
-            connectionMySql.query(sql, login, function (err, result) {
+            connectionMySql.query(sql, [login], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
@@ -151,25 +149,12 @@ module.exports = class User {
 
     static getUserData(id) {
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT name, userName, photo FROM userdata WHERE id = ?";
+            const sql = "SELECT id, name, userName, photo FROM userdata WHERE id = ?";
             connectionMySql.query(sql, [id], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
                     resolve(result);
-                }
-            })
-        })
-    }
-
-    static getToken(login) {
-        return new Promise(function (resolve, reject) {
-            const sql = "SELECT token, refreshToken from userdata where login = ?";
-            connectionMySql.query(sql, [login], function (err, result) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result[0]);
                 }
             })
         })

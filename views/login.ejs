@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title><%= titleApp %></title>
     <meta charset="uth-8">
@@ -7,20 +7,21 @@
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link href="/css/style.css" rel="stylesheet" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 
 </head>
 <body>
 <%- include("partials/head.ejs") %>
 
-<form name="registerForm">
+<form name="registerForm" action="/profile" method="post">
     <div class="col-5 mt-5">
         <label class="col-2">Login</label>
-        <input type="text" name="login" id="login" required>
+        <label for="login"></label><input type="text" name="login" id="login" required>
     </div>
 
     <div class="col-5">
         <label class="col-2">Password</label>
-        <input type="password" name="password" id="password" required>
+        <label for="password"></label><input type="password" name="password" id="password" required>
         <p id='error'></p>
     </div>
 
@@ -31,31 +32,29 @@
 
 <script>
 
-    document.getElementById("submit").addEventListener("click", function (e) {
+    document.getElementById("password").addEventListener("mouseover", function (e) {
         e.preventDefault();
-        let token = {};
         let registerForm = document.forms["registerForm"];
         let login = registerForm.elements["login"].value;
         let password = registerForm.elements["password"].value;
 
-        axios.post('/password/login', {
-            login: login,
-            password: password
-        }).then(res=>{
-            addToken(token, res);
-        }).catch(() =>{
-            document.getElementById("error").style.color = "red";
-            document.getElementById("error").innerText = "login or password false";
-        })
+        loginProfile(login, password);
 
     });
 
-    function addToken(token, res){
-        token.token = res.data.token;
-        token.refreshToken = res.data.refreshToken;
-        document.getElementById("error").innerText = "";
+    async function loginProfile(login, password) {
+        await axios.post('/password/login', {
+            login: login,
+            password: password
+        }).then(() => {
+            document.getElementById("error").innerText = "";
+            document.getElementById("submit").disabled = false;
+        }).catch(() => {
+            document.getElementById("error").style.color = "red";
+            document.getElementById("error").innerText = "login or password false";
+            document.getElementById("submit").disabled = true;
+        })
     }
-
 
 </script>
 </body>
