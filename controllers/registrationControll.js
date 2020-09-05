@@ -178,3 +178,10 @@ exports.update = function (request, response) {
     response.json(request.body);
 }
 
+exports.logout = function (request, response){
+    request.session.destroy();
+    response.render("login", {
+        titleApp: "Login"
+    })
+}
+
