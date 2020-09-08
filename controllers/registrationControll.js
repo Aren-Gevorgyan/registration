@@ -188,5 +188,6 @@ exports.logout = function (request, response){
 exports.comment = function(request, response){
     if(!request.body) return response.sendStatus(404);
     response.json(request.body);
+    
 }
 
