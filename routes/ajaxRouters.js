@@ -7,5 +7,6 @@ ajaxRouters.post("/password", registrationControllers.password);
 ajaxRouters.post("/email", registrationControllers.email);
 ajaxRouters.post("/update", registrationControllers.update);
 ajaxRouters.post("/delete", registrationControllers.delete);
+ajaxRouters.post("/comment", registrationControllers.comment);
 
 module.exports = ajaxRouters;
