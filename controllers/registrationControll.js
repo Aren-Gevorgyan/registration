@@ -1,4 +1,5 @@
 const Users = require('../modules/registrationModules');
+const Post = require('../modules/postModules');
 const passwordHash = require('password-hash');
 const keys = require('../config/keys')
 
@@ -178,16 +179,21 @@ exports.update = function (request, response) {
     response.json(request.body);
 }
 
-exports.logout = function (request, response){
+exports.logout = function (request, response) {
     request.session.destroy();
     response.render("login", {
         titleApp: "Login"
     })
 }
 
-exports.comment = function(request, response){
-    if(!request.body) return response.sendStatus(404);
+exports.comment = function (request, response) {
+    if (!request.body) return response.sendStatus(404);
+    const id = request.params["id"];
+    const comment = request.body.comment;
+
+    const post = new Post(id, comment, "");
+    post.appendDataInPost();
+
     response.json(request.body);
-    
 }
 

@@ -78,3 +78,26 @@ form > div > p {
 #sendComment{
     font-size: 28px;
 }
+
+.commentUser{
+    border-radius: 4px;
+    background-color: gainsboro;
+}
+
+#writeComment{
+    overflow: hidden;
+    margin-top: 10px;
+    margin-left: 6px;
+    margin-bottom: 60px;
+}
+
+#writeComment > div{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+#writeComment > div > p{
+    width: 80%;
+    word-wrap: break-word
+}

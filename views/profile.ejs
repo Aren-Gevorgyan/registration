@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    
+
 <head>
 
     <title><%= titleApp %></title>
@@ -28,11 +28,11 @@
     <div class="addPost col-6 offset-4">
 
         <div class="post col-5">
-                <input type='file' onchange='openFile(event)'><br>
+            <input type='file' onchange='openFile(event)'><br>
         </div>
 
         <div class="setPost col-7 mt-4">
-               <img id='output' class="col-12">
+            <img id='output' class="col-12">
         </div>
 
         <div id="comment" class="col-7">
@@ -40,11 +40,15 @@
             <h3>Comment</h3>
         </div>
 
-        <div id ="setMessage" class="col-7">
+        <div id="setMessage" class="col-7">
             <form name="commentForm" id="commentForm">
-               <input type="text" name="comment" id="setComment" class="col-11">
-               <i class="material-icons" id="sendComment">send</i>
+                <input type="text" name="comment" id="setComment" class="col-11">
+                <i class="material-icons" id="sendComment">send</i>
             </form>
+        </div>
+
+        <div id="writeComment" class="col-5">
+
         </div>
 
     </div>
@@ -53,28 +57,49 @@
 
 <script src="../public/script/profile.js"></script>
 <script>
-document.getElementById("sendComment").addEventListener("click", function(e){
-    e.preventDefault();
-    
-    const commentForm = document.forms["commentForm"];
-    const commentValue = commentForm.elements["comment"].value;
+    document.getElementById("sendComment").addEventListener("click", function (e) {
+        e.preventDefault();
 
-    comment(commentValue)
-     
-})
+        const commentForm = document.forms["commentForm"];
+        const commentValue = commentForm.elements["comment"].value;
+        if (commentValue !== "") {
+            comment(commentValue);
+        }
+    })
 
-async function comment(comment) {
-        await axios.post('/comment', {
+    async function comment(comment) {
+        await axios.post(`/comment/ <%= user[0].id %>`, {
             comment: comment,
         }).then((res) => {
-             const comment = document.createElement("p");
-             comment.innerText = res.data.comment;
-             document.getElementById("setMessage").appendChild(comment);
-             document.getElementById('setComment').value = '';
+            writeComment(res)
         }).catch((err) => {
-             console.log(err);
+            console.log(err);
         })
     }
+
+    let idUnique = 1;
+
+    function writeComment(res) {
+        const containerComment = document.createElement("div");
+        const comment = document.createElement("p");
+        containerComment.setAttribute('id', `containerComment${idUnique}`);
+        comment.setAttribute('class', "commentUser");
+        comment.innerText = res.data.comment;
+        document.getElementById("writeComment").appendChild(containerComment);
+        document.getElementById(`containerComment${idUnique}`).appendChild(comment);
+        document.getElementById(`containerComment${idUnique}`).appendChild(editComment());
+        document.getElementById('setComment').value = '';
+        idUnique++;
+    }
+
+    function editComment() {
+        const editComment = document.createElement("i");
+        editComment.setAttribute('class', "far fa-edit");
+        editComment.setAttribute('id', 'edit');
+        return editComment;
+    }
+
+
 
 </script>
 
