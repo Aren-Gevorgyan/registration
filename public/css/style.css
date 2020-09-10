@@ -48,11 +48,11 @@ form > div > p {
     margin-top: 60px;
 }
 
-.addPost{
+.addPost {
     margin-top: 100px;
 }
 
-#comment{
+#comment {
     opacity: 0;
     display: flex;
     justify-content: center;
@@ -60,38 +60,48 @@ form > div > p {
     margin-top: 60px;
 }
 
-#setMessage{
+#setMessage {
     opacity: 0;
     border-radius: 4px;
 }
 
-#setMessage > p{
+#setMessage > p {
     margin-top: 10px;
     margin-left: 4px;
 }
 
-#commentForm{
+#commentForm {
     display: flex;
 }
 
-#sendComment{
+#sendComment {
     font-size: 28px;
 }
 
-#writeComment{
+#writeComment {
     overflow: hidden;
     margin-top: 10px;
     margin-left: 6px;
     margin-bottom: 60px;
 }
 
-#writeComment > div{
+#writeComment > div {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
 
-#writeComment > div > p{
+#writeComment > div > p {
     width: 80%;
-    word-wrap: break-word
+    word-wrap: break-word;
+}
+
+.delete {
+    font-size: 18px;
+    height: 30px;
+}
+
+.edit {
+    margin-top: 4px;
+    height: 30px;
 }

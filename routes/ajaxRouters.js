@@ -3,6 +3,7 @@ const registrationControllers = require('../controllers/registrationControll');
 const ajaxRouters = express.Router();
 
 ajaxRouters.post("/comment/edit", registrationControllers.editComment);
+ajaxRouters.post("/comment/delete", registrationControllers.deleteComment);
 ajaxRouters.post("/password/login", registrationControllers.passwordLogin);
 ajaxRouters.post("/comment", registrationControllers.comment);
 ajaxRouters.post("/password", registrationControllers.password);

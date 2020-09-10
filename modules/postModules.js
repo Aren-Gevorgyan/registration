@@ -27,13 +27,25 @@ module.exports = class Post {
     }
 
     static editComment(comment, id, presentComment) {
-        console.log(comment, id, presentComment);
         return new Promise(function (resolve, reject){
             const sql = "UPDATE post SET comment = ? WHERE userId = ? AND comment = ?";
             connectionMySql.query(sql, [comment, id, presentComment], (err, result) => {
                 if (err) {
                     reject(err);
                 }else{
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static deleteComment(id, comment) {
+        return new Promise(function (resolve, reject) {
+            const sql = "DELETE FROM post WHERE userId = ? AND comment = ?";
+            connectionMySql.query(sql, [id, comment], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
                     resolve(result);
                 }
             })

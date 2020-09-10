@@ -60,13 +60,17 @@ exports.email = function (request, response) {
         let ifEmailIsNull;
         for (let i = 0; i < data.length; i++) {
             ifEmailNotExists = request.body.email === data[i].email;
-            ifEmailIsNull = request.body.email.length === 0;
-            if (ifEmailNotExists || ifEmailIsNull) {
-                return response.json("Is email already exists or null, write new email");
-            }
+            verifyEmail(ifEmailIsNull, ifEmailNotExists, request, response);
         }
         return response.json(request.body);
     });
+}
+
+function verifyEmail(ifEmailIsNull, ifEmailNotExists, request, response){
+    ifEmailIsNull = request.body.email.length === 0;
+    if (ifEmailNotExists || ifEmailIsNull) {
+        return response.json("Is email already exists or null, write new email");
+    }
 }
 
 function ifLoginIsNull(request, response) {
@@ -81,18 +85,22 @@ exports.account = function (request, response) {
     const getUrlId = request.params['id'];
     const ifEqual = id === parseInt(getUrlId);
     if (ifEqual) {
-        Users.getUserData(id)
-            .then(data => {
-                response.render("profile", {
-                    titleApp: 'Account',
-                    user: data
-                });
-            }).catch(err => {
-            console.log(err.message);
-        });
+        openAccount(id, response);
     } else {
         response.redirect("/");
     }
+}
+
+function openAccount(id, response){
+    Users.getUserData(id)
+        .then(data => {
+            response.render("profile", {
+                titleApp: 'Account',
+                user: data
+            });
+        }).catch(err => {
+        console.log(err.message);
+    });
 }
 
 exports.profile = function (request, response) {
@@ -152,12 +160,16 @@ function existsPassword(data, request, response) {
     let ifPasswordIsNull;
     for (let i = 0; i < data.length; i++) {
         ifPasswordNotExists = passwordHash.verify(password, data[i].password);
-        ifPasswordIsNull = request.body.password.length === 0;
-        if (ifPasswordNotExists || ifPasswordIsNull) {
-            return response.json("Password exists, write new password");
-        } else {
-            return response.json(request.body);
-        }
+        verifyPassword(ifPasswordIsNull, request, response, ifPasswordNotExists);
+    }
+}
+
+function verifyPassword(ifPasswordIsNull, request, response, ifPasswordNotExists){
+    ifPasswordIsNull = request.body.password.length === 0;
+    if (ifPasswordNotExists || ifPasswordIsNull) {
+        return response.json("Password exists, write new password");
+    } else {
+        return response.json(request.body);
     }
 }
 
@@ -202,8 +214,22 @@ exports.editComment = function (request, response){
     const id = request.session.userId;
     const comment = request.body.valueComment;
     const presentComment = request.body.presentComment;
-    console.log(id, comment, presentComment)
-    Post.editComment(comment, id, presentComment).then(res=>{
+    replaceComment(comment, id, presentComment, response)
+}
+
+function replaceComment(comment, id, presentComment, response){
+    Post.editComment(comment, id, presentComment).then(()=>{
+        response.sendStatus(200);
+    }).catch(err=>{
+        console.log(err.message);
+    })
+}
+
+exports.deleteComment = function (request, response){
+    if (!request.body) return response.sendStatus(404);
+    const id = request.session.userId;
+    const comment = request.body.valueComment;
+    Post.deleteComment(id, comment).then(()=>{
         response.sendStatus(200);
     }).catch(err=>{
         console.log(err.message);
