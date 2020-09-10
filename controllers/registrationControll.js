@@ -188,12 +188,25 @@ exports.logout = function (request, response) {
 
 exports.comment = function (request, response) {
     if (!request.body) return response.sendStatus(404);
-    const id = request.params["id"];
+    const id = request.session.userId;
     const comment = request.body.comment;
 
     const post = new Post(id, comment, "");
-    post.appendDataInPost();
+    post.appendData();
 
     response.json(request.body);
+}
+
+exports.editComment = function (request, response){
+    if (!request.body) return response.sendStatus(404);
+    const id = request.session.userId;
+    const comment = request.body.valueComment;
+    const presentComment = request.body.presentComment;
+    console.log(id, comment, presentComment)
+    Post.editComment(comment, id, presentComment).then(res=>{
+        response.sendStatus(200);
+    }).catch(err=>{
+        console.log(err.message);
+    })
 }
 

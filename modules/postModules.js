@@ -16,13 +16,27 @@ module.exports = class Post {
         postAndComment.push(this.userId, this.comment, this.post);
     }
 
-    appendDataInPost() {
+    appendData() {
         const sql = "INSERT INTO post(USERID, COMMENT, POST) VALUE (?,?,?)";
-        connectionMySql.query(sql, postAndComment, (err)=> {
+        connectionMySql.query(sql, postAndComment, (err) => {
             if (err) {
                 console.log(err);
             }
         })
         postAndComment.length = 0;
+    }
+
+    static editComment(comment, id, presentComment) {
+        console.log(comment, id, presentComment);
+        return new Promise(function (resolve, reject){
+            const sql = "UPDATE post SET comment = ? WHERE userId = ? AND comment = ?";
+            connectionMySql.query(sql, [comment, id, presentComment], (err, result) => {
+                if (err) {
+                    reject(err);
+                }else{
+                    resolve(result);
+                }
+            })
+        })
     }
 }

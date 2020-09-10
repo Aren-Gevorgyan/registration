@@ -56,52 +56,5 @@
 </div>
 
 <script src="../public/script/profile.js"></script>
-<script>
-    document.getElementById("sendComment").addEventListener("click", function (e) {
-        e.preventDefault();
-
-        const commentForm = document.forms["commentForm"];
-        const commentValue = commentForm.elements["comment"].value;
-        if (commentValue !== "") {
-            comment(commentValue);
-        }
-    })
-
-    async function comment(comment) {
-        await axios.post(`/comment/ <%= user[0].id %>`, {
-            comment: comment,
-        }).then((res) => {
-            writeComment(res)
-        }).catch((err) => {
-            console.log(err);
-        })
-    }
-
-    let idUnique = 1;
-
-    function writeComment(res) {
-        const containerComment = document.createElement("div");
-        const comment = document.createElement("p");
-        containerComment.setAttribute('id', `containerComment${idUnique}`);
-        comment.setAttribute('class', "commentUser");
-        comment.innerText = res.data.comment;
-        document.getElementById("writeComment").appendChild(containerComment);
-        document.getElementById(`containerComment${idUnique}`).appendChild(comment);
-        document.getElementById(`containerComment${idUnique}`).appendChild(editComment());
-        document.getElementById('setComment').value = '';
-        idUnique++;
-    }
-
-    function editComment() {
-        const editComment = document.createElement("i");
-        editComment.setAttribute('class', "far fa-edit");
-        editComment.setAttribute('id', 'edit');
-        return editComment;
-    }
-
-
-
-</script>
-
 </body>
 </html>
