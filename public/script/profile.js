@@ -1,4 +1,5 @@
 let idUnique = 1;
+let imgUnique = 1;
 
 const openFile = event => {
 
@@ -6,9 +7,9 @@ const openFile = event => {
     const reader = new FileReader();
     reader.onload = function () {
         const dataURL = reader.result;
-        const output = document.getElementById('output');
+        const output = document.getElementById("img");
         output.src = dataURL;
-        document.getElementById("comment").style.opacity = "1";
+        document.getElementById("comment").style.display = "block";
     };
     reader.readAsDataURL(input.files[0]);
 };
@@ -28,7 +29,7 @@ function writeComment(res) {
     const comment = document.createElement("p");
     containerComment.setAttribute('id', `containerComment${idUnique}`);
     comment.setAttribute('class', `commentUser${idUnique}`);
-    comment.setAttribute("contenteditable", `false`);
+    comment.setAttribute("contenteditable", 'false');
     comment.innerText = res.data.comment;
     document.getElementById("writeComment").appendChild(containerComment);
     document.getElementById(`containerComment${idUnique}`).appendChild(comment);
@@ -44,7 +45,7 @@ function editComment() {
     return editComment;
 }
 
-function deleteComment(){
+function deleteComment() {
     const deleteComment = document.createElement("i");
     deleteComment.setAttribute('class', "material-icons  delete");
     deleteComment.innerText = "delete";
@@ -63,7 +64,7 @@ async function comment(comment) {
 
 document.getElementById("comment")
     .addEventListener("click", function () {
-        document.getElementById("setMessage").style.opacity = "1";
+        document.getElementById("setMessage").style.display = "block";
     })
 
 document.getElementById("sendComment").addEventListener("click", function () {
@@ -118,10 +119,10 @@ function requestEdit(presentComment, valueComment, element) {
     axios.post("/comment/edit", {
         presentComment,
         valueComment
-    }).then(()=>{
+    }).then(() => {
         element.setAttribute("contenteditable", "false");
         element.style.backgroundColor = "white";
-    }).catch(err=>{
+    }).catch(err => {
         console.log(err);
     })
 }
@@ -129,9 +130,9 @@ function requestEdit(presentComment, valueComment, element) {
 function requestDelete(element, valueComment) {
     axios.post("/comment/delete", {
         valueComment
-    }).then(()=>{
+    }).then(() => {
         element.style.display = "none";
-    }).catch(err=>{
+    }).catch(err => {
         console.log(err);
     })
 }
